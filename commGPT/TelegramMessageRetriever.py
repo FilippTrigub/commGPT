@@ -75,7 +75,7 @@ def write_to_file(output_path, messages, chat_name):
         json.dump(messages, f)
 
 
-async def main(chat_name, start_date):
+async def main(chat_name, start_date, output_directory):
     load_dotenv()
     phone_number = os.getenv('PHONE_NUMBER')  # input('Enter your phone number: ')
     api_id = int(os.getenv('TELEGRAM_API_ID'))
@@ -89,12 +89,12 @@ async def main(chat_name, start_date):
         chat_name=chat_name,
         start_date=start_date
     )
-    write_to_file('telegram_messages', chat_messages, chat_name)
+    write_to_file(output_directory, chat_messages, chat_name)
 
 
-def retrieve_telegram_messages(chat_name, start_date):
+def retrieve_telegram_messages(chat_name, start_date, output_directory):
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(main(chat_name, start_date))
+    loop.run_until_complete(main(chat_name, start_date, output_directory))
 
 # if __name__ == '__main__':
 #     loop = asyncio.get_event_loop()

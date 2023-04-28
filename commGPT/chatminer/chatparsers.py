@@ -243,7 +243,9 @@ class TelegramJsonParser(Parser):
         with self._file.open(encoding="utf-8") as f:
             json_objects = json.load(f)
 
-        if "messages" in json_objects:
+        if type(json_objects) is list:
+            self._raw_messages = json_objects
+        elif "messages" in json_objects:
             self._raw_messages = json_objects["messages"]
         else:
             if self.chat_name:
@@ -267,7 +269,7 @@ class TelegramJsonParser(Parser):
             )
 
     def _parse_message(self, mess):
-        if "from" in mess and "text" in mess:
+        if "text" in mess:
             if isinstance(mess["text"], str):
                 body = mess["text"]
             elif isinstance(mess["text"], list):
@@ -286,8 +288,11 @@ class TelegramJsonParser(Parser):
             else:
                 raise ValueError(f"Unable to parse type {type(mess['text'])} in {mess}")
 
-            time = datetime.datetime.fromtimestamp(int(mess["date_unixtime"]))
-            author = mess["from"]
+            if type(mess['date']) is str:
+                time = datetime.datetime.strptime(mess["date"], "%d-%m-%Y %H:%M:%S")
+            else:
+                time = datetime.datetime.fromtimestamp(int(mess["date"]))
+            author = mess["sender_id"]
             return ParsedMessage(time, author, body)
         return False
 
