@@ -9,16 +9,40 @@ import telethon
 from telethon import TelegramClient
 
 
-async def get_messages(client, chat_name, start_date):
-    # Find the specified chat
-    chats = await client.get_dialogs()
-    chat = None
-    for c in chats:
-        if c.title == chat_name:
-            chat = c
-            break
-    if chat is None:
-        return None
+async def get_telegram_chat(client, chat_name=None, chat_link=None):
+    """
+    Gets the specified chat. If chat_link is specified, it will be used to get the chat. Otherwise, the chat_name will.
+    Args:
+        client: The TelegramClient object.
+        chat_name: The name of the chat to get.
+        chat_link: The link to the chat to get.
+
+    Returns: The chat object.
+    """
+    if chat_link:
+        chat = await client.get_entity(chat_link)
+    else:
+        # Find the specified chat
+        chats = await client.get_dialogs()
+        chat = None
+        for c in chats:
+            if c.title == chat_name:
+                chat = c.entity
+    return chat
+
+
+async def get_messages(client, chat_name=None, chat_link=None, start_date=datetime.today().strftime('%d-%m-%Y')):
+    """
+    Gets all of the messages from the specified chat since the specified date. Returns a list of dictionaries with the
+    following keys: 'text', 'date', 'sender_id'.
+    param client: The TelegramClient object.
+    param chat_name: The name of the chat to get the messages from.
+    param chat_link: The link to the chat to get the messages from.
+    param start_date: The date to start getting messages from.
+
+    return: A list of dictionaries with the following keys: 'text', 'date', 'sender_id'.
+    """
+    chat = await get_telegram_chat(client, chat_name, chat_link)
 
     # Get all of the messages since the specified date
     messages = []
@@ -26,7 +50,7 @@ async def get_messages(client, chat_name, start_date):
     while date <= datetime.now():
         print(f'Getting messages from {date.strftime("%d-%m-%Y")}.')
         get_history = await client(
-            GetHistoryRequest(peer=chat.entity, offset_id=0, offset_date=datetime.now(), add_offset=0, limit=1000,
+            GetHistoryRequest(peer=chat, offset_id=0, offset_date=datetime.now(), add_offset=0, limit=1000,
                               max_id=0, min_id=0, hash=0))
         if not get_history.messages:
             break
@@ -46,7 +70,8 @@ async def get_messages(client, chat_name, start_date):
     return messages
 
 
-async def telegram_messages(phone_number, api_id, api_hash, chat_name, start_date):
+async def telegram_messages(phone_number, api_id, api_hash, chat_name=None, chat_link=None,
+                            start_date=datetime.today().strftime('%d-%m-%Y')):
     client = TelegramClient(phone_number, api_id, api_hash)
     await client.connect()
 
@@ -57,7 +82,7 @@ async def telegram_messages(phone_number, api_id, api_hash, chat_name, start_dat
         except telethon.errors.rpc_error_list.PhoneCodeInvalidError:
             return None
 
-    chat_messages = await get_messages(client, chat_name, start_date)
+    chat_messages = await get_messages(client=client, chat_name=chat_name, chat_link=chat_link, start_date=start_date)
 
     if not chat_messages:
         return None
@@ -75,27 +100,25 @@ def write_to_file(output_path, messages, chat_name):
         json.dump(messages, f)
 
 
-async def main(chat_name, start_date, output_directory):
+async def main(output_directory, chat_name=None, chat_link=None, start_date=datetime.today().strftime('%d-%m-%Y')):
     load_dotenv()
-    phone_number = os.getenv('PHONE_NUMBER')  # input('Enter your phone number: ')
+    phone_number = os.getenv('PHONE_NUMBER')
     api_id = int(os.getenv('TELEGRAM_API_ID'))
     api_hash = os.getenv('TELEGRAM_API_HASH')
-    # chat_name = 'Berlin helps Ukrainians'  # input('Enter the name of the chat: ')
-    # start_date = '22-04-2023'  # input('Enter the start date (dd-mm-yyyy): ')
     chat_messages = await telegram_messages(
         phone_number=phone_number,
         api_id=api_id,
         api_hash=api_hash,
         chat_name=chat_name,
+        chat_link=chat_link,
         start_date=start_date
     )
     write_to_file(output_directory, chat_messages, chat_name)
 
 
-def retrieve_telegram_messages(chat_name, start_date, output_directory):
+def retrieve_telegram_messages(chat_name, chat_link, start_date, output_directory):
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(main(chat_name, start_date, output_directory))
-
-# if __name__ == '__main__':
-#     loop = asyncio.get_event_loop()
-#     loop.run_until_complete(main())
+    loop.run_until_complete(main(output_directory=output_directory,
+                                 chat_name=chat_name,
+                                 chat_link=chat_link,
+                                 start_date=start_date))

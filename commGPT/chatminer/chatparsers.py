@@ -270,7 +270,9 @@ class TelegramJsonParser(Parser):
 
     def _parse_message(self, mess):
         if "text" in mess:
-            if isinstance(mess["text"], str):
+            if mess["text"] is None:
+                body = ''
+            elif isinstance(mess["text"], str):
                 body = mess["text"]
             elif isinstance(mess["text"], list):
                 assert all(
