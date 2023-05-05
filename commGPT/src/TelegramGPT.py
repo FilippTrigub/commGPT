@@ -1,3 +1,5 @@
+import os
+
 from haystack import Document
 from haystack.document_stores import FAISSDocumentStore
 from haystack.nodes import OpenAIAnswerGenerator, EmbeddingRetriever
