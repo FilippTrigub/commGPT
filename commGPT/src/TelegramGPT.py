@@ -7,7 +7,7 @@ from haystack.nodes import OpenAIAnswerGenerator, EmbeddingRetriever
 from haystack.pipelines import GenerativeQAPipeline
 
 from commGPT.src.TelegramMessageRetriever import retrieve_telegram_messages
-from commGPT.chatminer.chatparsers import TelegramJsonParser
+from commGPT.src.chatparsers import TelegramJsonParser
 
 
 class TelegramGPT:
