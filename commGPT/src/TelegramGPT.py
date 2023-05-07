@@ -1,4 +1,5 @@
 import os
+import threading
 
 from haystack import Document
 from haystack.document_stores import FAISSDocumentStore
@@ -10,15 +11,20 @@ from commGPT.chatminer.chatparsers import TelegramJsonParser
 
 
 class TelegramGPT:
-    def __init__(self, chat_name, chat_link, start_date, output_directory):
+    def __init__(self, output_directory):
+        self.start_date = None
+        self.chat_link = None
+        self.chat_name = None
         self.generator = None
         self.retriever = None
         self.document_store = None
         self.pipeline = None
+        self.output_directory = output_directory
+
+    def set_params(self, chat_name, chat_link, start_date):
         self.chat_name = chat_name
         self.chat_link = chat_link
         self.start_date = start_date
-        self.output_directory = output_directory
 
     def download_telegram_messages(self, remove_old_files=True):
         """
@@ -30,7 +36,12 @@ class TelegramGPT:
                 os.remove(os.path.join(self.output_directory, file_path))
 
         initial_number_of_files = len(os.listdir(self.output_directory))
-        retrieve_telegram_messages(self.chat_name, self.chat_link, self.start_date, self.output_directory)
+
+        t = threading.Thread(target=retrieve_telegram_messages,
+                             args=(self.chat_name, self.chat_link, self.start_date, self.output_directory))
+        t.start()
+        t.join()
+        # retrieve_telegram_messages(self.chat_name, self.chat_link, self.start_date, self.output_directory)
 
         print(f'Downloaded {len(os.listdir(self.output_directory)) - initial_number_of_files} files.')
 
