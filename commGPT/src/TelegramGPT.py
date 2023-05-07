@@ -1,4 +1,5 @@
 import os
+import threading
 
 from haystack import Document
 from haystack.document_stores import FAISSDocumentStore
@@ -35,7 +36,12 @@ class TelegramGPT:
                 os.remove(os.path.join(self.output_directory, file_path))
 
         initial_number_of_files = len(os.listdir(self.output_directory))
-        retrieve_telegram_messages(self.chat_name, self.chat_link, self.start_date, self.output_directory)
+
+        t = threading.Thread(target=retrieve_telegram_messages,
+                             args=(self.chat_name, self.chat_link, self.start_date, self.output_directory))
+        t.start()
+        t.join()
+        # retrieve_telegram_messages(self.chat_name, self.chat_link, self.start_date, self.output_directory)
 
         print(f'Downloaded {len(os.listdir(self.output_directory)) - initial_number_of_files} files.')
 

@@ -117,8 +117,15 @@ async def main(output_directory, chat_name=None, chat_link=None, start_date=date
 
 
 def retrieve_telegram_messages(chat_name, chat_link, start_date, output_directory):
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(main(output_directory=output_directory,
-                                 chat_name=chat_name,
-                                 chat_link=chat_link,
-                                 start_date=start_date))
+    # loop = asyncio.new_event_loop()
+    # asyncio.set_event_loop(loop)
+    # todo database is locked after first execution: fix this
+    asyncio.run(main(output_directory=output_directory,
+                     chat_name=chat_name,
+                     chat_link=chat_link,
+                     start_date=start_date))
+
+    # loop.run_until_complete(main(output_directory=output_directory,
+    #                              chat_name=chat_name,
+    #                              chat_link=chat_link,
+    #                              start_date=start_date))
