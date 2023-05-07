@@ -1,4 +1,5 @@
 import os
+import subprocess
 
 import uvicorn as uvicorn
 from dotenv import load_dotenv
@@ -77,5 +78,7 @@ async def on_disconnect(sid: str):
 
 
 if __name__ == "__main__":
+    process = subprocess.Popen(
+        'streamlit run C:\\coding_challanges\\commGPT\\frontend\\Streamlit_UI.py --server.port 8080')
 
     uvicorn.run("ChatWithTGChat:app", host="0.0.0.0", port=8090, log_level="info", reload=True)
