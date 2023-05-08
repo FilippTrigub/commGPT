@@ -5,7 +5,6 @@ import uvicorn as uvicorn
 from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi_socketio import SocketManager
-from haystack.utils import print_answers
 from pydantic import BaseModel
 
 from commGPT.src.TelegramGPT import TelegramGPT
