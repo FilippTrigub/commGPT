@@ -4,8 +4,8 @@ import os
 from datetime import datetime, timedelta
 
 from dotenv import load_dotenv
-from telethon.tl.functions.messages import GetHistoryRequest
 import telethon
+from telethon.tl.functions.messages import GetHistoryRequest
 from telethon import TelegramClient
 
 
@@ -100,9 +100,10 @@ def write_to_file(output_path, messages, chat_name):
         json.dump(messages, f)
 
 
-async def main(output_directory, chat_name=None, chat_link=None, start_date=datetime.today().strftime('%d-%m-%Y')):
+async def main(phone_number, output_directory, chat_name=None, chat_link=None,
+               start_date=datetime.today().strftime('%d-%m-%Y')):
     load_dotenv()
-    phone_number = os.getenv('PHONE_NUMBER')
+    # phone_number = os.getenv('PHONE_NUMBER') todo
     api_id = int(os.getenv('TELEGRAM_API_ID'))
     api_hash = os.getenv('TELEGRAM_API_HASH')
     chat_messages = await telegram_messages(
@@ -116,11 +117,12 @@ async def main(output_directory, chat_name=None, chat_link=None, start_date=date
     write_to_file(output_directory, chat_messages, chat_name)
 
 
-def retrieve_telegram_messages(chat_name, chat_link, start_date, output_directory):
+def retrieve_telegram_messages(phone_number, chat_name, chat_link, start_date, output_directory):
     # loop = asyncio.new_event_loop()
     # asyncio.set_event_loop(loop)
     # todo database is locked after first execution: fix this
-    asyncio.run(main(output_directory=output_directory,
+    asyncio.run(main(phone_number=phone_number,
+                     output_directory=output_directory,
                      chat_name=chat_name,
                      chat_link=chat_link,
                      start_date=start_date))

@@ -1,18 +1,21 @@
-FROM 3.10.11-slim-buster
+FROM python:3.10.11-slim-buster
 
-WORKDIR /app
+WORKDIR ./
 
 COPY requirements.txt requirements.txt
-RUN pip install -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
-COPY .. .
+COPY .env .env
+COPY api api
+COPY frontend frontend
 
-EXPOSE 8080
-EXPOSE 8090
+EXPOSE 7100
+EXPOSE 7000
 
-ENV PYTHONPATH "${PYTHONPATH}:/app"
+ENV PYTHONPATH "${PYTHONPATH}:./"
 
-CMD ["python", "commGPT\ChatWithTGChat.py"]
+COPY startup.sh startup.sh
 
-HEALTHCHECK --interval=5m --timeout=3s \
-  CMD curl -f http://localhost:8090/ || exit 1
+CMD ["./startup.sh"]
+
+HEALTHCHECK --interval=5m --timeout=3s CMD curl -f http://localhost:7000 || exit 1

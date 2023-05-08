@@ -1,5 +1,10 @@
+import asyncio
+import os
+
 import streamlit as st
 import requests
+from dotenv import load_dotenv
+from telethon import TelegramClient
 
 
 def main():
@@ -24,13 +29,13 @@ def main():
             "chat_link": chat_link,
             "start_date": start_date
         }
-        retrieval_done = requests.post("http://localhost:8090/retrieve_messages", json=payload)
+        retrieval_done = requests.post(f"http://localhost:{os.getenv('API_PORT')}/retrieve_messages", json=payload)
 
     if st.button('Send', key='send_button', disabled=not retrieval_done):
         # display user input in chat history
         chat_history.write(f"You: {chat_input}")
 
-        response = requests.post("http://localhost:8090/query", json={"query": chat_input})
+        response = requests.post(f"http://localhost:{os.getenv('API_PORT')}/query", json={"query": chat_input})
         bot_response = response.json()
 
         # display bot response in chat history
@@ -38,4 +43,5 @@ def main():
 
 
 if __name__ == "__main__":
+    load_dotenv()
     main()

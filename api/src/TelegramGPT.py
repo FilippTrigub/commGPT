@@ -6,12 +6,13 @@ from haystack.document_stores import FAISSDocumentStore
 from haystack.nodes import OpenAIAnswerGenerator, EmbeddingRetriever
 from haystack.pipelines import GenerativeQAPipeline
 
-from commGPT.src.TelegramMessageRetriever import retrieve_telegram_messages
-from commGPT.src.chatparsers import TelegramJsonParser
+from api.src.TelegramMessageRetriever import retrieve_telegram_messages
+from api.src.chatparsers import TelegramJsonParser
 
 
 class TelegramGPT:
     def __init__(self, output_directory):
+        self.phone_number = None
         self.start_date = None
         self.chat_link = None
         self.chat_name = None
@@ -21,7 +22,8 @@ class TelegramGPT:
         self.pipeline = None
         self.output_directory = output_directory
 
-    def set_params(self, chat_name, chat_link, start_date):
+    def set_params(self, phone_number, chat_name, chat_link, start_date):
+        self.phone_number = phone_number
         self.chat_name = chat_name
         self.chat_link = chat_link
         self.start_date = start_date
@@ -38,7 +40,8 @@ class TelegramGPT:
         initial_number_of_files = len(os.listdir(self.output_directory))
 
         t = threading.Thread(target=retrieve_telegram_messages,
-                             args=(self.chat_name, self.chat_link, self.start_date, self.output_directory))
+                             args=(
+                             self.phone_number, self.chat_name, self.chat_link, self.start_date, self.output_directory))
         t.start()
         t.join()
         # retrieve_telegram_messages(self.chat_name, self.chat_link, self.start_date, self.output_directory)
