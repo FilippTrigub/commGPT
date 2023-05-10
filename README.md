@@ -8,6 +8,6 @@ Build the image:
 
 Run the image:
 
-`docker run -it communitygpt -p 7000:7000 -p 7100:7100`
+`docker run  -p 7000:7000 -p 7100:7100 commgpt`
 
 

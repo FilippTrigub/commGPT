@@ -72,7 +72,7 @@ async def get_messages(client, chat_name=None, chat_link=None, start_date=dateti
 
 async def telegram_messages(phone_number, api_id, api_hash, chat_name=None, chat_link=None,
                             start_date=datetime.today().strftime('%d-%m-%Y')):
-    client = TelegramClient(phone_number, api_id, api_hash)
+    client = TelegramClient(f'./{phone_number}.session', api_id, api_hash)
     await client.connect()
 
     if not await client.is_user_authorized():

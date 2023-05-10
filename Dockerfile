@@ -10,7 +10,6 @@ COPY api api
 COPY frontend frontend
 
 EXPOSE 7100
-EXPOSE 7000
 
 ENV PYTHONPATH "${PYTHONPATH}:./"
 
@@ -18,4 +17,4 @@ COPY startup.sh startup.sh
 
 CMD ["./startup.sh"]
 
-HEALTHCHECK --interval=5m --timeout=3s CMD curl -f http://localhost:7000 || exit 1
+HEALTHCHECK --interval=5m --timeout=3s CMD curl -f http://localhost:7100 || exit 1
