@@ -19,7 +19,7 @@ async def login_with_phone(container, phone_number):
         code = container.text_input("Enter the authentication code:")
         submit_code = container.button("Submit Authentication Code")
         time.sleep(5)
-        while not submit_code and not code and not await client.is_user_authorized():
+        while not await client.is_user_authorized() and (not submit_code or not code):
             time.sleep(1)
         if submit_code and code:
             try:
