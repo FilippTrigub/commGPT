@@ -13,14 +13,14 @@ from streamlit import session_state as ss
 async def login_with_phone(container, phone_number):
     client = TelegramClient(f'./{phone_number}.session', int(os.getenv('TELEGRAM_API_ID')), os.getenv('TELEGRAM_API_HASH'))
     await client.connect()
-    time.sleep(5)
+    time.sleep(1)
     if not await client.is_user_authorized():
         await client.send_code_request(phone_number)
         code = container.text_input("Enter the authentication code:")
         submit_code = container.button("Submit Authentication Code")
         time.sleep(5)
-        while not submit_code and not code:
-            time.sleep(5)
+        while not submit_code and not code and not await client.is_user_authorized():
+            time.sleep(1)
         if submit_code and code:
             try:
                 await client.sign_in(phone_number, code)
