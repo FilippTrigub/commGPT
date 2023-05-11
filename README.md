@@ -4,7 +4,7 @@
 
 Build the image:
 
-`docker build -t communitygpt .`
+`docker build -t commgpt .`
 
 Run the image:
 

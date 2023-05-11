@@ -1,5 +1,6 @@
 import asyncio
 import os
+import time
 
 import streamlit as st
 import requests
@@ -16,6 +17,9 @@ async def login_with_phone(container, phone_number):
         await client.send_code_request(phone_number)
         code = container.text_input("Enter the authentication code:")
         submit_code = container.button("Submit Authentication Code")
+        time.sleep(5)
+        while not submit_code and not code:
+            time.sleep(1)
         if submit_code and code:
             try:
                 await client.sign_in(phone_number, code)
@@ -50,10 +54,10 @@ def main():
     if 'logged_in' in ss.keys() and ss.logged_in:
         login_state.empty()
         st.sidebar.header("Enter chat information")
-        phone_number = st.sidebar.text_input("Phone Number:", "")
+        phone_number = st.sidebar.text_input("Phone Number:", "+491784042916")
         chat_name = st.sidebar.text_input("Chat Name:", "")
-        chat_link = st.sidebar.text_input("Chat Link:", "")
-        start_date = st.sidebar.text_input("Start Date (dd-mm-YYYY):", "")
+        chat_link = st.sidebar.text_input("Chat Link:", "https://t.me/+N4D2CVc0QbU5NWMy")
+        start_date = st.sidebar.text_input("Start Date (dd-mm-YYYY):", "08-05-2023")
 
         chat_history = st.empty()
         chat_input = st.text_input("You:", key='input_main_screen')

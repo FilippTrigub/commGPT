@@ -1,10 +1,10 @@
 import asyncio
 import json
 import os
+import time
 from datetime import datetime, timedelta
 
 from dotenv import load_dotenv
-import telethon
 from telethon.tl.functions.messages import GetHistoryRequest
 from telethon import TelegramClient
 
@@ -74,13 +74,10 @@ async def telegram_messages(phone_number, api_id, api_hash, chat_name=None, chat
                             start_date=datetime.today().strftime('%d-%m-%Y')):
     client = TelegramClient(f'./{phone_number}.session', api_id, api_hash)
     await client.connect()
+    time.sleep(2)
 
     if not await client.is_user_authorized():
-        await client.send_code_request(phone_number)
-        try:
-            await client.sign_in(phone_number, code=input('Enter the code sent to your Telegram: '))
-        except telethon.errors.rpc_error_list.PhoneCodeInvalidError:
-            return None
+        raise Exception('User not authorized.') #todo
 
     chat_messages = await get_messages(client=client, chat_name=chat_name, chat_link=chat_link, start_date=start_date)
 
