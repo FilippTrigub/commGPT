@@ -5,10 +5,9 @@ import uvicorn as uvicorn
 from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi_socketio import SocketManager
-from haystack.utils import print_answers
 from pydantic import BaseModel
 
-from commGPT.src.TelegramGPT import TelegramGPT
+from api.src.TelegramGPT import TelegramGPT
 
 app = FastAPI()
 socket_manager = SocketManager(app=app)
@@ -18,6 +17,7 @@ tgpt = TelegramGPT(output_directory=os.getenv('OUTPUT_DIRECTORY'))
 
 
 class ChatInfo(BaseModel):
+    phone_number: str
     chat_name: str
     chat_link: str
     start_date: str
@@ -28,7 +28,8 @@ async def retrieve_messages(chat_info: ChatInfo):
     """
     Retrieve messages from Telegram chat and save them to a file.
     """
-    tgpt.set_params(chat_name=chat_info.chat_name, chat_link=chat_info.chat_link, start_date=chat_info.start_date)
+    tgpt.set_params(phone_number=chat_info.phone_number, chat_name=chat_info.chat_name, chat_link=chat_info.chat_link,
+                    start_date=chat_info.start_date)
 
     tgpt.download_telegram_messages()
     tgpt.parse_telegram_messages()
@@ -78,7 +79,8 @@ async def on_disconnect(sid: str):
 
 
 if __name__ == "__main__":
-    process = subprocess.Popen(
-        'streamlit run C:\\coding_challanges\\commGPT\\frontend\\Streamlit_UI.py --server.port 8080')
+    # process = subprocess.Popen(
+    #     'streamlit run frontend\\Streamlit_UI.py --server.port 8080')
 
-    uvicorn.run("ChatWithTGChat:app", host="0.0.0.0", port=8090, log_level="info", reload=True)
+    uvicorn.run("ChatWithTGChat:app", host=os.getenv('HOST_INTERFACE'), port=int(os.getenv('API_PORT')),
+                log_level="info", reload=True)

@@ -5,8 +5,8 @@ from unittest.mock import MagicMock, patch
 
 from dotenv import load_dotenv
 
-from commGPT.chatminer.chatparsers import ParsedMessageCollection, ParsedMessage
-from commGPT.src.TelegramGPT import TelegramGPT
+from api.chatminer.chatparsers import ParsedMessageCollection, ParsedMessage
+from api.src.TelegramGPT import TelegramGPT
 
 
 class TestTelegramGPT(unittest.TestCase):
@@ -34,14 +34,14 @@ class TestTelegramGPT(unittest.TestCase):
             os.rmdir(self.output_directory)
 
     def test_download_telegram_messages(self):
-        with patch("commGPT.src.TelegramGPT.retrieve_telegram_messages") as mock_retrieve_telegram_messages:
+        with patch("api.src.TelegramGPT.retrieve_telegram_messages") as mock_retrieve_telegram_messages:
             result = self.telegram_gpt.download_telegram_messages()
             mock_retrieve_telegram_messages.assert_called_with(
                 self.chat_name, self.chat_link, self.start_date, self.output_directory
             )
 
     def test_parse_telegram_messages(self):
-        with patch("commGPT.src.TelegramGPT.TelegramJsonParser") as mock_telegram_json_parser:
+        with patch("api.src.TelegramGPT.TelegramJsonParser") as mock_telegram_json_parser:
             mock_parser_instance = MagicMock()
             mock_parser_instance.parsed_messages = [{"text": "test_message"}]
             mock_telegram_json_parser.return_value = mock_parser_instance
@@ -56,10 +56,10 @@ class TestTelegramGPT(unittest.TestCase):
             self.assertEqual(self.telegram_gpt.results["test_file"][0], {"text": "test_message"})
 
     def test_set_pipeline(self):
-        with patch("commGPT.src.TelegramGPT.FAISSDocumentStore") as mock_faiss_document_store, \
-                patch("commGPT.src.TelegramGPT.EmbeddingRetriever") as mock_embedding_retriever, \
-                patch("commGPT.src.TelegramGPT.OpenAIAnswerGenerator") as mock_openai_answer_generator, \
-                patch("commGPT.src.TelegramGPT.GenerativeQAPipeline") as mock_generative_qa_pipeline:
+        with patch("api.src.TelegramGPT.FAISSDocumentStore") as mock_faiss_document_store, \
+                patch("api.src.TelegramGPT.EmbeddingRetriever") as mock_embedding_retriever, \
+                patch("api.src.TelegramGPT.OpenAIAnswerGenerator") as mock_openai_answer_generator, \
+                patch("api.src.TelegramGPT.GenerativeQAPipeline") as mock_generative_qa_pipeline:
 
             self.telegram_gpt.set_pipeline()
 
@@ -69,7 +69,7 @@ class TestTelegramGPT(unittest.TestCase):
             mock_generative_qa_pipeline.assert_called()
 
     def test_write_messages_to_document_store(self):
-        with patch("commGPT.src.TelegramGPT.Document") as mock_document:
+        with patch("api.src.TelegramGPT.Document") as mock_document:
             test_collection = ParsedMessageCollection()
             test_collection.append(ParsedMessage(message='test_message', timestamp=datetime.now(), author='test_author'))
             self.telegram_gpt.results = {

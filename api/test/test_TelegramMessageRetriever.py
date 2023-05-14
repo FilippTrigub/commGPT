@@ -6,7 +6,7 @@ from datetime import datetime
 from telethon import TelegramClient
 from telethon.tl.functions.messages import GetHistoryRequest
 
-import commGPT.src.TelegramMessageRetriever as tmr
+import api.src.TelegramMessageRetriever as tmr
 
 
 class TestTelegramMethods(unittest.TestCase):
@@ -36,7 +36,7 @@ class TestTelegramMethods(unittest.TestCase):
         chat = await tmr.get_telegram_chat(client, chat_name=self.chat_name)
         mock_get_dialogs.assert_called()
 
-    @patch("commGPT.src.TelegramMessageRetriever.get_telegram_chat")
+    @patch("api.src.TelegramMessageRetriever.get_telegram_chat")
     async def test_get_messages(self, mock_get_telegram_chat):
         client = MagicMock(TelegramClient)
         mock_chat = MagicMock()
@@ -61,7 +61,7 @@ class TestTelegramMethods(unittest.TestCase):
             self.assertEqual(messages[0]["date"], "2023-01-01 12:00:00")
             self.assertEqual(messages[0]["sender_id"], 123)
 
-    @patch("commGPT.src.TelegramMessageRetriever.get_messages")
+    @patch("api.src.TelegramMessageRetriever.get_messages")
     async def test_telegram_messages(self, mock_get_messages):
         with patch("telethon.TelegramClient.connect") as mock_connect, \
                 patch("telethon.TelegramClient.is_user_authorized") as mock_is_user_authorized, \
@@ -99,7 +99,7 @@ class TestTelegramMethods(unittest.TestCase):
             mock_open.assert_called_with(file_pattern, "w")
             mock_dump.assert_called_with(messages, mock_open.return_value)
 
-    @patch("commGPT.src.TelegramMessageRetriever.main")
+    @patch("api.src.TelegramMessageRetriever.main")
     def test_retrieve_telegram_messages(self, mock_main):
         loop = asyncio.get_event_loop()
         tmr.retrieve_telegram_messages(chat_name=self.chat_name, chat_link=self.chat_link, start_date=self.start_date, output_directory=self.output_directory)
