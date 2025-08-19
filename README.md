@@ -3,7 +3,9 @@
 ## Make Telegram chats searchable! 
 
 You're a nomad? Find apartments quickly!
+
 You're buying a new chair? Scan your local selling channels!
+
 You're a journalist analyzing russian propaganda? Run semantic analysis!
 
 ## Run with Docker
